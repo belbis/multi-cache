@@ -1,0 +1,18 @@
+{
+  "name": "multi-cache",
+  "repository": "",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "nodeunit test",
+    "coveralls": "jscoverage src && MULTICACHE_COV=1 nodeunit --reporter=lcov test | coveralls"
+  },
+  "devDependencies": {
+    "nodeunit": "0.9.0",
+    "jscoverage": "0.5.9",
+    "coveralls": "2.11.2"
+  },
+  "dependencies": {
+    "aws-sdk": "2.1.8",
+    "dynamizer": "0.0.4"
+  }
+}
