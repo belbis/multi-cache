@@ -77,14 +77,15 @@ var testConstructor = function(test) {
  * @param test
  */
 var testConnect = function(test) {
-  test.expect(1);
+  test.expect(2);
 
   var dc = new DynamoDBCache({});
-  var willThrow = function() {
-    dc.connect();
-  };
-  test.throws(willThrow, errors.InvalidParametersError);
 
+  var connectCallback = function(e,r) {
+    test.ok(r == undefined);
+    test.ok(e instanceof errors.InvalidParametersError);
+  };
+  dc.connect(null, connectCallback);
   test.done();
 };
 

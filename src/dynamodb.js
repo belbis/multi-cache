@@ -53,11 +53,12 @@ DynamoDBCache.prototype.validateConnectOptions = function(o) {
  * connect to DynamoDB
  * @param options -- the connect options required for dynamodb
  */
-DynamoDBCache.prototype.connect = function(options) {
+DynamoDBCache.prototype.connect = function(options, callback) {
   if (this.validateConnectOptions(options)) {
     this.remote = new AWS.DynamoDB(options);
+    callback(null, true);
   } else {
-    throw new errors.InvalidParametersError;
+    callback(new errors.InvalidParametersError);
   }
 };
 
