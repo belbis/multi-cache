@@ -1,7 +1,7 @@
 {
   "name": "multi-cache",
   "repository": "https://github.com/belbis/multi-cache",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "test": "nodeunit test",
     "coveralls": "jscoverage src && MULTICACHE_COV=1 nodeunit --reporter=lcov test | coveralls"
@@ -12,7 +12,7 @@
     "coveralls": "2.11.2"
   },
   "dependencies": {
-    "aws-sdk": "2.1.8",
+    "aws-sdk": "2.1.14",
     "dynamizer": "0.0.4"
   }
 }
