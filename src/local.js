@@ -46,7 +46,7 @@ LocalCache.prototype.connect = function(options, callback) {
   if (this.validateConnectOptions(options)) {
     callback(null, true);
   } else {
-    callback(new errors.InvalidParametersError());
+    callback && callback(new errors.InvalidParametersError());
   }
 };
 
@@ -61,7 +61,6 @@ LocalCache.prototype.connect = function(options, callback) {
  */
 LocalCache.prototype.get = function(key, options, callback) {
   if (typeof(options) === "function") callback = options;
-
   if (this.remote.hasOwnProperty(key)) {
     callback(null, this.remote[key]);
   } else {

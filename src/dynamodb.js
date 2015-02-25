@@ -31,6 +31,7 @@ function DynamoDBCache(options) {
   }
 
   this.dynamizer = Dynamizer();
+  this.local = {};
 }
 util.inherits(DynamoDBCache, Cache);
 
@@ -156,19 +157,40 @@ DynamoDBCache.prototype.get = function(key, options, callback) {
   if (typeof(options) === "function") callback = options;
 
   var params = this._construct_get_params(key);
+  var returned = false;
 
   // for callback
   var self = this;
 
+  if (this.local.hasOwnProperty(key)) {
+    var ret = this.local[key];
+    if (ret instanceof Error) {
+      callback(ret);
+    } else {
+      callback(null, this.local[key]);
+    }
+    returned=true;
+  }
+
   var getItemCallback = function(e, r) {
     if (e) {
-      callback(new errors.CacheError(e.message));
+      self.local[key] = new errors.CacheError(e.message);
+      if (!returned) callback(new errors.CacheError(e.message));
+
     } else if (Object.keys(r).length === 0) {
-      callback(new errors.CacheMissError());
+      self.local[key] = new errors.CacheMissError();
+
+      if (!returned) callback(new errors.CacheMissError());
+
     } else if (r.hasOwnProperty("Item")) {
-      callback(null, self.dynamizer.decode(r.Item));
+
+      self.local[key] = self.dynamizer.decode(r.Item);
+
+      if (!returned) callback(null, self.dynamizer.decode(r.Item));
+
     } else { // TODO: necessary?
-      callback(new CacheError("Invalid Return Type"));
+      //callback(new CacheError("Invalid Return Type"));
+      // idk
     }
   };
   this.remote.getItem(params, getItemCallback);
