@@ -1,7 +1,7 @@
 {
   "name": "multi-cache",
   "repository": "https://github.com/belbis/multi-cache",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "test": "nodeunit test/**/",
     "test-coveralls": "nodeunit test/**/ --reporter=lcov ",

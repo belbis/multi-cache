@@ -202,7 +202,8 @@ MultiCache.prototype.clear = function(callback) {
 // export module
 module.exports = {
   getCache: function(s, o) {
-    if (storage.lower.hasOwnProperty(s)) return (new MultiCache(o)).setStorage(storage.lower[s]());
+    var o = o || {};
+    if (storage.lower.hasOwnProperty(s)) return (new MultiCache(o)).setStorage(storage.lower[s](o.storageOptions));
     throw new errors.InvalidParametersError();
   },
   storage: storage,
