@@ -26,33 +26,27 @@ caches
 
 ## usage
 
-dynamodb example:
+simple memcached example:
+
 ```javascript
-var connectOptions = {
-  region: "DYNAMODB_REGION",
-  accessKeyId: "DYNAMODB_ACCESSKEYID",
-  secretAccessKey: "DYNAMODB_SECRETACCESSKEY"
-};
+var mc = require("multi-cache").getCache("memcached");
 
-var cache = DynamoDBCache();
-
-cache.connect(connectOptions);
-
-cache.set('1', 3);
-
-cache.get('1', function(e,r) {
+var getCallback = function(e,r) {
+  if (e) throw e;
   console.log(r);
-});
+  mc.disconnect();
+};
+var setCallback = function(e,r) {
+  if (e) throw e;
+  mc.get("foo", getCallback);
+};
+var connectCallback = function() {
+  mc.set("foo", "bar", setCallback);
+};
+mc.connect(connectCallback);
 ```
 
-redis example
-```javascript
-
-var connectOptions = {
-  host: "REDIS_HOST",
-  db: "REDIS_DB",
-}
-```
+see more examples in the [examples](examples/) folder
 
 ## disclaimer
 
@@ -69,7 +63,4 @@ npm test```
 
 ## future
 
-implement options?
-    useEmitters - use event emitters instead of callbacks
-    usePromises - use promises instead of callbacks
-    retries - number of retries an operation will be attempted
+add new storage

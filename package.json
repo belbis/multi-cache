@@ -1,18 +1,27 @@
 {
   "name": "multi-cache",
   "repository": "https://github.com/belbis/multi-cache",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "scripts": {
-    "test": "nodeunit test",
-    "coveralls": "jscoverage src && MULTICACHE_COV=1 nodeunit --reporter=lcov test | coveralls"
+    "test": "nodeunit test/**/",
+    "test-coveralls": "nodeunit test/**/ --reporter=lcov ",
+    "test-covcheck": "nodeunit test/**/ --reporter=html",
+    "jshint": "jshint src",
+    "coveralls": "jscoverage src && MULTICACHE_COV=1 npm run test-coveralls | coveralls",
+    "coverage": "jscoverage src && MULTICACHE_COV=1 npm run test-coveralls",
+    "": ""
   },
   "devDependencies": {
     "nodeunit": "0.9.0",
     "jscoverage": "0.5.9",
-    "coveralls": "2.11.2"
+    "coveralls": "2.11.2",
+    "jshint": "2.6.3"
   },
   "dependencies": {
     "aws-sdk": "2.1.16",
+    "memcached": "2.1.0",
+    "hiredis": "0.2.0",
+    "redis": "0.12.1",
     "dynamizer": "0.0.4"
   }
 }

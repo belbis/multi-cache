@@ -11,7 +11,7 @@ var util = require("util");
  */
 function InvalidParametersError(msg) {
   this.name = "InvalidParametersError";
-  this.message = msg || "Invalid Parameters.";
+  this.message = msg || "invalid parameters";
 }
 util.inherits(InvalidParametersError, Error);
 
@@ -24,7 +24,7 @@ util.inherits(InvalidParametersError, Error);
  */
 function NotImplementedError(msg) {
   this.name = "NotImplementedError";
-  this.message = msg || "Not Implemented.";
+  this.message = msg || "not implemented";
 }
 util.inherits(NotImplementedError, Error);
 
@@ -37,7 +37,7 @@ util.inherits(NotImplementedError, Error);
  */
 function CacheError(msg) {
   this.name = "CacheError";
-  this.message = msg || "Cache Error."
+  this.message = msg || "Cache Error.";
 }
 util.inherits(CacheError, Error);
 
@@ -51,7 +51,7 @@ util.inherits(CacheError, Error);
  */
 function CacheMissError(msg) {
   this.name = "CacheMissError";
-  this.message = msg || "Cache Miss."
+  this.message = msg || "cache miss";
 }
 util.inherits(CacheMissError, Error);
 

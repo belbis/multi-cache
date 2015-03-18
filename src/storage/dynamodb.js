@@ -3,37 +3,36 @@
 var util = require("util");
 
 // local imports
-var Cache = require(__dirname + "/cache");
-var errors = require(__dirname + "/errors");
+var Remote = require(__dirname + "/remote").Remote;
+var errors = require(__dirname + "/../errors");
 
 // npm imports
 var AWS = require("aws-sdk");
 var Dynamizer = require("dynamizer");
 
 /**
- * DynamoDBCache
+ * DynamoDB
  *
- * a cache that uses DynamoDB as its remote source
+ * dynamodb storage for MultiCache
  * uses a dynamizer object to encode
+ * @implements {Remote}
  * @param options
- * @returns {Cache}
+ * @returns {DynamoDB}
  * @constructor
  */
-function DynamoDBCache(options) {
-  if (!(this instanceof DynamoDBCache)) return new DynamoDBCache(options);
+function DynamoDB(options) {
+  if (!(this instanceof DynamoDB)) return new DynamoDB(options);  // don't require new
 
-  if (options) {
-    this.table = options.table || "table";
-    this.hashKey = options.hashKey || "id";
-    this.metaKey = options.metaKey || "_meta"; // info not needed by result
-  } else {
-    throw new errors.InvalidParametersError();
-  }
+  // handle options
+  options = options || {};
+  this.table = options.table || "table";
+  this.hashKey = options.hashKey || "id";
+  this.metaKey = options.metaKey || "_meta"; // info not needed by result
+  this.dataKey = options.dataKey || "_data";
 
   this.dynamizer = Dynamizer();
-  this.local = {};
 }
-util.inherits(DynamoDBCache, Cache);
+util.inherits(DynamoDB, Remote);
 
 /**
  * validateConnectOptions
@@ -41,7 +40,7 @@ util.inherits(DynamoDBCache, Cache);
  * ensures that the connection options are valid
  * @param o
  */
-DynamoDBCache.prototype.validateConnectOptions = function(o) {
+DynamoDB.prototype.validateConnectOptions = function(o) {
   return o &&
          o.hasOwnProperty("accessKeyId") &&
          o.hasOwnProperty("secretAccessKey") &&
@@ -53,38 +52,41 @@ DynamoDBCache.prototype.validateConnectOptions = function(o) {
  *
  * connect to DynamoDB
  * @param options -- the connect options required for dynamodb
+ * @param callback
  */
-DynamoDBCache.prototype.connect = function(options, callback) {
+DynamoDB.prototype.connect = function(options, callback) {
   if (this.validateConnectOptions(options)) {
     this.remote = new AWS.DynamoDB(options);
     callback(null, true);
   } else {
-    callback(new errors.InvalidParametersError);
+    callback(new errors.InvalidParametersError());
   }
 };
 
 /**
  * disconnect
  *
- * disconnects from remote data source
+ * disconnect the storage from remote source
+ * @param callback {function} next step
  */
-DynamoDBCache.prototype.disconnect = function() {
-  delete this.remote;
+DynamoDB.prototype.disconnect = function(callback) {
+  this.remote = null;
+  callback(null, true);
 };
 
 /**
- * set
+ * setItem
  *
- * implements set cache for dynamodb
- * @param key -- key
- * @param value -- value to be set
- * @param options -- extra options
- * @param callback -- function to be called on completion
+ * store a value at given key
+ * @param key {string} key to store value
+ * @param value {object} object to be stored
+ * @param options {object} options
+ * @param callback {function} next step
  */
-DynamoDBCache.prototype.set = function(key, value, options, callback) {
+DynamoDB.prototype.setItem = function(key, value, options, callback) {
   if (typeof(options) === "function") callback = options;
 
-  var params = this._construct_set_params(key, value);
+  var params = this._constructSetParams(key, value);
   var putItemCallback = function(e,r) {
     if (e) {
       callback(new errors.CacheError(e.message));
@@ -96,7 +98,19 @@ DynamoDBCache.prototype.set = function(key, value, options, callback) {
 };
 
 /**
- * _construct_set_params
+ * setItemSync
+ *
+ * store value at given key synchronously
+ * @param key
+ * @param value
+ * @param options
+ */
+DynamoDB.prototype.setItemSync = function(key, value, options) {
+  throw new errors.NotImplementedError();
+};
+
+/**
+ * _constructSetParams
  *
  * helper to construct set parameters
  * @param key
@@ -104,97 +118,224 @@ DynamoDBCache.prototype.set = function(key, value, options, callback) {
  * @returns {object} a valid object to be used in putItem operation
  * @private
  */
-DynamoDBCache.prototype._construct_set_params = function(key, value) {
+DynamoDB.prototype._constructSetParams = function(key, value, meta) {
 
   // put key into value
-  if (value.constructor === Object) {
-    value[this.hashKey] = key;
-    for (var i in value) {
-      if (value.hasOwnProperty(i)) {
-        value[i] = this.dynamizer.encode(value[i]);
-      }
-    }
-  } else { // construct object
-    var o = {};
-    o[this.hashKey] = this.dynamizer.encode(key);
-  }
-
+  var o = {};
+  var meta = meta || {
+    expire: -1,
+    lastUpdated: (new Date).getTime()
+  };
+  o[this.dataKey] = this.dynamizer.encode(value);
+  o[this.metaKey] = this.dynamizer.encode(meta);
+  o[this.hashKey] = this.dynamizer.encode(key);
   return {
     TableName: this.table,
-    Item: value,
+    Item: o
   };
 };
 
 /**
- * _construct_get_params
+ * _constructGetParams
  *
  * helper to construct get parameters
  * @param key
- * @returns  valid params object for get request
+ * @returns  {object} valid params object for get request
  * @private
  */
-DynamoDBCache.prototype._construct_get_params = function(key) {
+DynamoDB.prototype._constructGetParams = function(key) {
   // set up dynamo fetch
   var p = {
     TableName: this.table//,
     //"Key": this.dynamizer.encodeKey(this.hashKey, key)
   };
-  p["Key"] =  {};
-  p["Key"][this.hashKey] = this.dynamizer.encode(key);
+  p.Key =  {};
+  p.Key[this.hashKey] = this.dynamizer.encode(key);
   return p;
 };
 
 /**
- * get
+ * getItem
  *
- * implemeents set cache for dynamodb
- * @param key -- key whose value to be fetched
- * @param options -- extra options to consider
- * @param callback -- function to be invoked on completion
+ * retrieve the value stored at key
+ * @param key {string} key who's value to be fetched
+ * @param options {object} options
+ * @param callback {function} next step
  */
-DynamoDBCache.prototype.get = function(key, options, callback) {
-
+DynamoDB.prototype.getItem = function(key, options, callback) {
+  var cur = (new Date).getTime();
   if (typeof(options) === "function") callback = options;
 
-  var params = this._construct_get_params(key);
-  var returned = false;
-
-  // for callback
   var self = this;
-
-  if (this.local.hasOwnProperty(key)) {
-    var ret = this.local[key];
-    if (ret instanceof Error) {
-      callback(ret);
-    } else {
-      callback(null, this.local[key]);
-    }
-    returned=true;
-  }
+  var params = this._constructGetParams(key);
 
   var getItemCallback = function(e, r) {
     if (e) {
-      self.local[key] = new errors.CacheError(e.message);
-      if (!returned) callback(new errors.CacheError(e.message));
+      callback(new errors.CacheError(e.message));
 
     } else if (Object.keys(r).length === 0) {
-      self.local[key] = new errors.CacheMissError();
-
-      if (!returned) callback(new errors.CacheMissError());
-
+      callback(new errors.CacheMissError());
     } else if (r.hasOwnProperty("Item")) {
 
-      self.local[key] = self.dynamizer.decode(r.Item);
-
-      if (!returned) callback(null, self.dynamizer.decode(r.Item));
-
-    } else { // TODO: necessary?
+      var ret = self._stripMeta(r, cur);
+      if (ret instanceof Error) {
+        callback(ret);
+      } else {
+        callback(null, ret);
+      }
+    } else { // TODO: something unexpected happened
       //callback(new CacheError("Invalid Return Type"));
       // idk
     }
   };
+  this.remote.getItem(params, getItemCallback); // use bind to avoid scope traversal?
+};
+
+/**
+ * getItemSync
+ *
+ * retrieve the value stored at key synchronously
+ * @param key {string} key who's value to be fetched
+ * @param options {object} options
+ */
+DynamoDB.prototype.getItemSync = function(key, options) {
+  throw new errors.NotImplementedError();
+};
+
+/**
+ * removeItem
+ *
+ * deletes the value stored at key
+ * @param key {string} key to be deleted
+ * @param callback {function} next step
+ */
+DynamoDB.prototype.removeItem = function(key, callback) {
+  callback(new errors.NotImplementedError());
+};
+
+/**
+ * removeItemSync
+ *
+ * deletes the value stored at key synchronously
+ * @param key
+ */
+DynamoDB.prototype.removeItemSync = function(key) {
+  throw new errors.NotImplementedError();
+};
+
+/**
+ * expire
+ *
+ * set the expiration for key
+ * @param key {string}
+ * @param expiration {number}
+ * @param callback {function} next step
+ */
+DynamoDB.prototype.expire = function(key, expiration, callback) {
+  if (typeof expiration !== "number") {
+    callback(new errors.InvalidParametersError);
+    return;
+  }
+
+  var self = this;
+  // finally execute callback
+  var setItemCallback = function(e,r) {
+    if (e) {
+      callback(e);
+    } else {
+      callback(null, true);
+    }
+  };
+
+  // then update value expiration
+  var getItemCallback = function(e,r) {
+    if (e) {
+      callback(e);
+    } else {
+      var o = self.dynamizer.decode(r.Item);
+      var meta = {
+        expire: expiration,
+        lastUpdated: (new Date).getTime()
+      };
+      var params = self._constructSetParams(key, o, meta);
+      self.remote.putItem(params, setItemCallback);
+    }
+  };
+  // first fetch key
+  // read in this ^ direction
+  var params = this._constructGetParams(key);
   this.remote.getItem(params, getItemCallback);
 };
 
+/**
+ * expireSync
+ *
+ * set the expiration for key synchronously
+ */
+DynamoDB.prototype.expireSync = function(key, expiration) {
+  throw new errors.NotImplementedError();
+};
+
+/**
+ * clear
+ *
+ * flushes the cache. DynamoDB doesn't have flush
+ * capability, so deleting the table and recreating
+ * it are better options
+ * @param callback {function} next step
+ */
+DynamoDB.prototype.clear = function(callback) {
+  callback(new errors.NotImplementedError());
+};
+
+/**
+ * clearSync
+ *
+ * clears the storage synchronously
+ */
+DynamoDB.prototype.clearSync = function() {
+  throw new errors.NotImplementedError();
+};
+
+/**
+ * key
+ *
+ * return the nth key in the storage
+ * @param n {number} index to fetch key
+ * @param callback {function} the next step
+ */
+DynamoDB.prototype.key = function(n, callback) {
+  callback(new errors.NotImplementedError());
+};
+
+/**
+ * keySync
+ *
+ * return the nth key in the storage synchronously
+ * @param n {number} index to fetch key
+ */
+DynamoDB.prototype.keySync = function(n) {
+  throw new errors.NotImplementedError();
+};
+
+/**
+ * _stripMeta
+ *
+ * strip out meta info from item
+ * @private
+ * @param r {object} return value of remote get
+ * @param ts {number} timestamp from getItem call
+ */
+DynamoDB.prototype._stripMeta = function(r, ts) {
+  var o = this.dynamizer.decode(r.Item);
+  if (o[this.metaKey].lastUpdated + (o[this.metaKey].expire * 1000) <= ts) {
+    return o._data;
+  } else {
+    return new errors.CacheMissError();
+  }
+};
+
 // export module
-module.exports = DynamoDBCache;
+module.exports = {
+  DynamoDB: DynamoDB
+};
