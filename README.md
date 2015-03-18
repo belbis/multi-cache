@@ -48,9 +48,6 @@ mc.connect(connectCallback);
 
 see more examples in the [examples](examples/) folder
 
-## disclaimer
-
-this project is under heavy development at the moment.
 
 ## tests
 
@@ -63,4 +60,4 @@ npm test```
 
 ## future
 
-add new storage
+extend storage options
