@@ -329,7 +329,7 @@ DynamoDB.prototype.keySync = function(n) {
 DynamoDB.prototype._stripMeta = function(r, ts) {
   var o = this.dynamizer.decode(r.Item);
   if (o[this.metaKey].lastUpdated + (o[this.metaKey].expire * 1000) <= ts) {
-    return o._data;
+    return o[this.dataKey] || o; // if data key not found just return object
   } else {
     return new errors.CacheMissError();
   }
