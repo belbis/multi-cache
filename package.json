@@ -1,7 +1,7 @@
 {
   "name": "multi-cache",
   "repository": "https://github.com/belbis/multi-cache",
-  "version": "0.1.2",
+  "version": "0.1.333",
   "scripts": {
     "test": "nodeunit test/**/",
     "test-coveralls": "nodeunit test/**/ --reporter=lcov ",
@@ -18,9 +18,9 @@
     "jshint": "2.6.3"
   },
   "dependencies": {
-    "aws-sdk": "2.1.16",
+    "aws-sdk": "2.1.21",
     "memcached": "2.1.0",
-    "hiredis": "0.2.0",
+    "hiredis": "0.3.0",
     "redis": "0.12.1",
     "dynamizer": "0.0.4"
   }
