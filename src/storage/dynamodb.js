@@ -7,6 +7,7 @@ var Remote = require(__dirname + "/remote").Remote;
 var errors = require(__dirname + "/../errors");
 
 // npm imports
+var uuid = require("uuid");
 var AWS = require("aws-sdk");
 var Dynamizer = require("dynamizer");
 
@@ -124,7 +125,8 @@ DynamoDB.prototype._constructSetParams = function(key, value, meta) {
   var o = {};
   var meta = meta || {
     expire: -1,
-    lastUpdated: (new Date).getTime()
+    lastUpdated: (new Date).getTime(),
+    rev: uuid.v4().split("-").join("")
   };
   o[this.dataKey] = this.dynamizer.encode(value);
   o[this.metaKey] = this.dynamizer.encode(meta);
