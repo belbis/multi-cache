@@ -123,7 +123,7 @@ DynamoDB.prototype._constructSetParams = function(key, value, meta) {
 
   // put key into value
   var o = {};
-  var meta = meta || {
+  meta = meta || {
     expire: -1,
     lastUpdated: (new Date).getTime(),
     rev: uuid.v4().split("-").join("")
