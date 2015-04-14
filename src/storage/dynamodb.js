@@ -125,7 +125,7 @@ DynamoDB.prototype._constructSetParams = function(key, value, meta) {
   var o = {};
   meta = meta || {
     expire: -1,
-    lastUpdated: (new Date).getTime(),
+    lastUpdated: Date.now(),
     rev: uuid.v4().split("-").join("")
   };
   o[this.dataKey] = this.dynamizer.encode(value);
@@ -165,7 +165,7 @@ DynamoDB.prototype._constructGetParams = function(key) {
  * @param callback {function} next step
  */
 DynamoDB.prototype.getItem = function(key, options, callback) {
-  var cur = (new Date).getTime();
+  var cur = Date.now();
   if (typeof(options) === "function") callback = options;
 
   var self = this;
@@ -235,7 +235,7 @@ DynamoDB.prototype.removeItemSync = function(key) {
  */
 DynamoDB.prototype.expire = function(key, expiration, callback) {
   if (typeof expiration !== "number") {
-    callback(new errors.InvalidParametersError);
+    callback(new errors.InvalidParametersError());
     return;
   }
 
@@ -257,7 +257,7 @@ DynamoDB.prototype.expire = function(key, expiration, callback) {
       var o = self.dynamizer.decode(r.Item);
       var meta = {
         expire: expiration,
-        lastUpdated: (new Date).getTime()
+        lastUpdated: Date.now()
       };
       var params = self._constructSetParams(key, o, meta);
       self.remote.putItem(params, setItemCallback);

@@ -86,7 +86,7 @@ MultiCache.prototype.get = function(key, options, callback) {
   var getItemCallback = function(e,r) {
     try { // in case cur was updated while fetch occurred
       cur = self.local.getItemSync(key);
-    } catch(e) {
+    } catch(err) {
       cur = null;
     }
     cur = cur || {_meta: {count: 0}};
@@ -188,7 +188,7 @@ MultiCache.prototype.clear = function(callback) {
   if (this.buffer) {
     var localClearCallback = function (e, r) {
       if (e) {
-        callback(e)
+        callback(e);
       } else {
         self.local.clear(callback);
       }
@@ -202,7 +202,7 @@ MultiCache.prototype.clear = function(callback) {
 // export module
 module.exports = {
   getCache: function(s, o) {
-    var o = o || {};
+    o = o || {};
     if (storage.lower.hasOwnProperty(s)) return (new MultiCache(o)).setStorage(storage.lower[s](o.storageOptions));
     throw new errors.InvalidParametersError();
   },

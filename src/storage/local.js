@@ -39,7 +39,7 @@ Local.prototype.getItem = function(key, options, callback) {
   }
   if (this.remote.hasOwnProperty(key)) {
     var o = this.remote[key];
-    var cur = (new Date).getTime();
+    var cur = Date.now();
     if (o._meta.lastUpdated + (o._meta.expire * 1000) <= cur) {
       callback(null, o.val);
     } else {
@@ -60,7 +60,7 @@ Local.prototype.getItem = function(key, options, callback) {
 Local.prototype.getItemSync = function(key, options) {
   if (this.remote.hasOwnProperty(key)) {
     var o = this.remote[key];
-    var cur = (new Date).getTime();
+    var cur = Date.now();
     if (o._meta.lastUpdated + (o._meta.expire*1000) <= cur) {
       return o.val;
     } else {
@@ -93,7 +93,7 @@ Local.prototype.setItem = function(key, value, options, callback) {
     _meta: {
       idx: this.keys.length-1,
       expire: -1,
-      lastUpdated: (new Date).getTime()
+      lastUpdated: Date.now()
     },
     val: value
   };
@@ -116,7 +116,7 @@ Local.prototype.setItemSync = function(key, value, options) {
     _meta: {
       idx: this.keys.length-1,
       expire: -1,
-      lastUpdated: (new Date).getTime()
+      lastUpdated: Date.now()
     },
     val: value
   };
@@ -193,7 +193,7 @@ Local.prototype.keySync = function(n) {
  * @param callback {function} next step
  */
 Local.prototype.expire = function(key, expiration, callback) {
-  var s = (new Date).getTime();
+  var s = Date.now();
   if (this.remote.hasOwnProperty(key)) {
     var cur = this.remote[key];
     cur._meta.lastUpdated = s;
@@ -208,7 +208,7 @@ Local.prototype.expire = function(key, expiration, callback) {
  * set the expiration for key synchronously
  */
 Local.prototype.expireSync = function(key, expiration) {
-  var s = (new Date).getTime();
+  var s = Date.now();
   if (this.remote.hasOwnProperty(key)) {
     var cur = this.remote[key];
     cur._meta.lastUpdated = s;
@@ -228,7 +228,7 @@ Local.prototype.expireSync = function(key, expiration) {
 Local.prototype.clear = function(callback) {
   this.keys.length = 0;
   this.remote = {};
-  callback(null, true)
+  callback(null, true);
 };
 
 /**
