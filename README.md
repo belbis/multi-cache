@@ -8,6 +8,7 @@ flexible cache interface with multiple backends as options
 [![Build Status](https://secure.travis-ci.org/belbis/multi-cache.png?branch=master)](http://travis-ci.org/belbis/multi-cache)
 [![Coverage Status](https://coveralls.io/repos/belbis/multi-cache/badge.svg)](https://coveralls.io/r/belbis/multi-cache)
 [![Dependency Status](https://gemnasium.com/belbis/multi-cache.svg)](https://gemnasium.com/belbis/multi-cache)
+[![Inline docs](http://inch-ci.org/github/belbis/multi-cache.svg?branch=master)](http://inch-ci.org/github/belbis/multi-cache)
 
 ## Installing
 
