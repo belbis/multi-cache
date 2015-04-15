@@ -5,6 +5,7 @@
 flexible cache interface with multiple backends as options
 
 [![NPM Version](https://nodei.co/npm/multi-cache.png?downloads=true)](https://npmjs.org/package/multi-cache)
+
 [![Build Status](https://secure.travis-ci.org/belbis/multi-cache.png?branch=master)](http://travis-ci.org/belbis/multi-cache)
 [![Coverage Status](https://coveralls.io/repos/belbis/multi-cache/badge.svg)](https://coveralls.io/r/belbis/multi-cache)
 [![Dependency Status](https://gemnasium.com/belbis/multi-cache.svg)](https://gemnasium.com/belbis/multi-cache)
