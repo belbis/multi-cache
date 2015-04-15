@@ -2,7 +2,7 @@
 
 # multi-cache 
 
-flexible cache interface with multiple backends as options
+a flexible cache for node.js with interchangeable storage backends inspired by [web storage](http://www.w3.org/TR/webstorage/)
 
 [![NPM Version](https://nodei.co/npm/multi-cache.png?downloads=true)](https://npmjs.org/package/multi-cache)
 
