@@ -2,7 +2,7 @@
   "name": "multi-cache",
   "repository": "https://github.com/belbis/multi-cache",
   "description": "a flexible cache for node.js",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "scripts": {
     "test": "nodeunit test/**/",
     "test-coveralls": "nodeunit test/**/ --reporter=lcov ",
