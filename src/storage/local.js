@@ -89,14 +89,7 @@ Local.prototype.setItem = function(key, value, options, callback) {
     this.keys.push(key);
   }
 
-  this.remote[key] = {
-    _meta: {
-      idx: this.keys.length-1,
-      expire: -1,
-      lastUpdated: Date.now()
-    },
-    val: value
-  };
+  this.remote[key] = this._createStorageItem(value);
   callback(null, true);
 };
 
@@ -112,7 +105,20 @@ Local.prototype.setItemSync = function(key, value, options) {
   if (!this.remote.hasOwnProperty(key)) {
     this.keys.push(key);
   }
-  this.remote[key] = {
+  this.remote[key] = this._createStorageItem(value);
+  return true;
+};
+
+/**
+ * _createStorageItem
+ *
+ * creates a storage item for local storage
+ * @param value
+ * @returns {{_meta: {idx: number, expire: number, lastUpdated: number}, val: *}}
+ * @private
+ */
+Local.prototype._createStorageItem = function(value) {
+  return {
     _meta: {
       idx: this.keys.length-1,
       expire: -1,
@@ -120,7 +126,6 @@ Local.prototype.setItemSync = function(key, value, options) {
     },
     val: value
   };
-  return true;
 };
 
 /**
@@ -193,12 +198,7 @@ Local.prototype.keySync = function(n) {
  * @param callback {function} next step
  */
 Local.prototype.expire = function(key, expiration, callback) {
-  var s = Date.now();
-  if (this.remote.hasOwnProperty(key)) {
-    var cur = this.remote[key];
-    cur._meta.lastUpdated = s;
-    cur._meta.expire = expiration;
-  }
+  this._expire(key, expiration);
   callback(null, true);
 };
 
@@ -208,13 +208,25 @@ Local.prototype.expire = function(key, expiration, callback) {
  * set the expiration for key synchronously
  */
 Local.prototype.expireSync = function(key, expiration) {
-  var s = Date.now();
+  this._expire(key, expiration);
+  return true;
+};
+
+/**
+ * _expire
+ *
+ * expire and expireSync perform the same action
+ * so it is performed here
+ * @param key
+ * @param expiration
+ * @private
+ */
+Local.prototype._expire = function(key, expiration) {
   if (this.remote.hasOwnProperty(key)) {
     var cur = this.remote[key];
-    cur._meta.lastUpdated = s;
+    cur._meta.lastUpdated = Date.now();
     cur._meta.expire = expiration;
   }
-  return true;
 };
 
 /**
