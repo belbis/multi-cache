@@ -1,13 +1,13 @@
 
 
-# multi-cache 
+# multi-cache [![Build Status](https://secure.travis-ci.org/belbis/multi-cache.png?branch=master)](http://travis-ci.org/belbis/multi-cache)
 
 a flexible cache for node.js with interchangeable storage backends inspired by [web storage](http://www.w3.org/TR/webstorage/)
 
 [![NPM Version](https://nodei.co/npm/multi-cache.png?downloads=true)](https://npmjs.org/package/multi-cache)
 
-[![Build Status](https://secure.travis-ci.org/belbis/multi-cache.png?branch=master)](http://travis-ci.org/belbis/multi-cache)
 [![Coverage Status](https://coveralls.io/repos/belbis/multi-cache/badge.svg)](https://coveralls.io/r/belbis/multi-cache)
+[![Code Climate](https://codeclimate.com/github/belbis/multi-cache/badges/gpa.svg)](https://codeclimate.com/github/belbis/multi-cache)
 [![Dependency Status](https://gemnasium.com/belbis/multi-cache.svg)](https://gemnasium.com/belbis/multi-cache)
 [![Inline docs](http://inch-ci.org/github/belbis/multi-cache.svg?branch=master)](http://inch-ci.org/github/belbis/multi-cache)
 
