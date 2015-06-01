@@ -2,27 +2,26 @@
   "name": "multi-cache",
   "repository": "https://github.com/belbis/multi-cache",
   "description": "a flexible cache for node.js",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "scripts": {
     "test": "nodeunit test/**/",
     "test-coveralls": "nodeunit test/**/ --reporter=lcov ",
     "test-covcheck": "nodeunit test/**/ --reporter=html",
     "jshint": "jshint src",
     "coveralls": "jscoverage src && MULTICACHE_COV=1 npm run test-coveralls | coveralls",
-    "coverage": "jscoverage src && MULTICACHE_COV=1 npm run test-coveralls",
-    "": ""
+    "coverage": "jscoverage src && MULTICACHE_COV=1 npm run test-coveralls"
   },
   "devDependencies": {
-    "nodeunit": "0.9.0",
+    "nodeunit": "0.9.1",
     "jscoverage": "0.5.9",
     "coveralls": "2.11.2",
-    "jshint": "2.7.0"
+    "jshint": "2.8.0"
   },
   "dependencies": {
     "uuid": "2.0.1",
-    "aws-sdk": "2.1.23",
+    "aws-sdk": "2.1.32",
     "memcached": "2.1.0",
-    "hiredis": "0.3.0",
+    "hiredis": "0.4.0",
     "redis": "0.12.1",
     "dynamizer": "0.0.4"
   }
